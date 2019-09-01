@@ -32,7 +32,7 @@ void print_bitmask(uint64_t x, int bits)
   (void) fprintf(stderr, "%lu: [", x);
 
   for (int i = 0; i < bits; ++i) {
-    if (x & (1UL << i))
+    if (x & (1UL << (uint64_t) i))
       (void) fprintf(stdout, "1");
     else
       (void) fprintf(stdout, "0");

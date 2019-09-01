@@ -44,7 +44,7 @@ void print_bitmask(uint64_t x, int bits)
 uint32_t clz64(uint64_t x)
 {
   for (uint64_t i = 0; i < 64; ++i) {
-    if (x & (1UL << i))
+    if (x & (1UL << (uint64_t) i))
       return i;
   }
 
@@ -54,7 +54,7 @@ uint32_t clz64(uint64_t x)
 uint32_t clz32(uint32_t x)
 {
   for (uint32_t i = 0; i < 32; ++i) {
-    if (x & (1UL << i))
+    if (x & (1UL << (uint32_t) i))
       return i;
   }
 
