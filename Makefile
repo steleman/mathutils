@@ -4,10 +4,10 @@ CFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
 CFLAGS += -O2 -std=c99 -mtune=core-avx2
 CFLAGS += -ftree-vectorize -ftree-slp-vectorize
 CFLAGS += -Wall -Wextra -flto=32
-
 LDFLAGS = -lm
+OPENMP = -fopenmp
 
-PROGRAMS = isprime popcnt clz ctz geomean
+PROGRAMS = isprime popcnt clz ctz geomean findprimes
 
 all: $(PROGRAMS)
 
@@ -16,6 +16,9 @@ isprime: isprime.o
 
 popcnt: popcnt.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+findprimes: findprimes.o
+	$(CC) $(CFLAGS) $(OPENMP) $(LDFLAGS) $< -o $@
 
 geomean: geomean.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
