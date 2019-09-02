@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     goto shortcut;
   }
 
-  uint64_t S = (uint64_t) sqrt(X);
+  uint64_t S = (uint64_t) ceil(sqrt(X));
 
   for (uint64_t I = 3; I <= S; ++I) {
     if ((X % I) == 0) {
