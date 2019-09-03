@@ -126,6 +126,11 @@ static int allocate_storage(void)
 {
   uint64_t span = range_end - range_start;
 
+  if (span == 0) {
+    (void) fprintf(stderr, "A search span range of zero makes no sense\n");
+    return -1;
+  }
+
   // Crude approximation. This is guaranteed to over-allocate.
   if (span < 10000UL)
     nprimes = span;
