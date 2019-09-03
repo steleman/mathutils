@@ -114,8 +114,8 @@ static bool is_prime(uint64_t x)
 
 static int check_bits(unsigned bits)
 {
-  if ((bits == 32) && (range_end > ULONG_MAX)) {
-    (void) fprintf(stderr, "end-range exceeds ULONG_MAX.\n");
+  if ((bits == 32) && (range_end > UINT_MAX)) {
+    (void) fprintf(stderr, "end-range exceeds 32-bit UINT_MAX.\n");
     return -1;
   }
 
