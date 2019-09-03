@@ -283,7 +283,7 @@ int main(int argc, char* argv[])
     range_start = 1UL;
 
   if (range_end == 0)
-    range_end = bits == 32 ? ULONG_MAX : ULLONG_MAX;
+    range_end = bits == 32 ? UINT_MAX : ULLONG_MAX;
 
   if (check_bits(bits) != 0)
     return 1;
