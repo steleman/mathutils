@@ -279,6 +279,9 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  if (range_start == 0)
+    range_start = 1UL;
+
   if (range_end == 0)
     range_end = bits == 32 ? ULONG_MAX : ULLONG_MAX;
 
