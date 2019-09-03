@@ -124,8 +124,15 @@ static int check_bits(unsigned bits)
 
 static int allocate_storage(void)
 {
+  uint64_t span = range_end - range_start;
+
   // Crude approximation. This is guaranteed to over-allocate.
-  nprimes = (uint64_t) ((range_end - range_start) / 10UL);
+  if (span < 10000UL)
+    nprimes = span;
+  else if (span < 1000000UL)
+    nprimes = span / 5UL;
+  else
+    nprimes = span / 10UL;
 
   errno = 0;
 
