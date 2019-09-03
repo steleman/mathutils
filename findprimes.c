@@ -86,7 +86,7 @@ static void print_time(const char* filename)
 
   (void) fprintf(fp, "-----\n");
   (void) fprintf(fp, "Discovered %lu prime numbers in %lu.%lu seconds.\n",
-                 (prime_index - 1),
+                 prime_index,
                  ts_diff.tv_sec, (ts_diff.tv_nsec * 1000000000) / 10);
   (void) fflush(fp);
 
