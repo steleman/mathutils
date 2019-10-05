@@ -58,7 +58,7 @@ static int qsort_compare(const void* l, const void* r)
 static void timestamp(struct timespec* ts)
 {
   errno = 0;
-  if (clock_gettime(CLOCK_MONOTONIC, ts) != 0) {
+  if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, ts) != 0) {
     (void) fprintf(stderr, "Could not get the timestamp: %s\n",
                    strerror(errno));
   }
@@ -84,10 +84,12 @@ static void print_time(const char* filename)
   ts_diff.tv_sec -= ts_correct.tv_sec;
   ts_diff.tv_nsec -= ts_correct.tv_nsec;
 
+  double t = (double) ts_diff.tv_nsec / 100000000;
+  t += (double) ts_diff.tv_sec;
+
   (void) fprintf(fp, "-----\n");
-  (void) fprintf(fp, "Discovered %lu prime numbers in %lu.%lu seconds.\n",
-                 prime_index,
-                 ts_diff.tv_sec, (ts_diff.tv_nsec * 1000000000) / 10);
+  (void) fprintf(fp, "Discovered %lu prime numbers in %lf seconds.\n",
+                 prime_index, t);
   (void) fflush(fp);
 
   if (filename)

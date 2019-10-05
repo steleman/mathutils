@@ -29,6 +29,9 @@ clz: clz.o
 ctz: ctz.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
+findprimes.o: findprimes.c
+	$(CC) $(CFLAGS) $(OPENMP) -c $< -o $@
+
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
 
