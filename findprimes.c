@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
 {
   int opt;
   unsigned bits = 64;
-  bool ph = false;
+  bool ph = (argc == 1);
   const char* filename = NULL;
 
   while ((opt = getopt(argc, argv, "hpts:e:b:f:")) != -1) {
