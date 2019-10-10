@@ -1,13 +1,10 @@
-CC = /opt/amd/aocc-compiler-2.0.0/bin/clang
+CC = /usr/bin/gcc
 
 CFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
-CFLAGS += -O3 -std=c99 -march=znver2
+CFLAGS += -O2 -std=c99 -mtune=core-avx2
 CFLAGS += -ftree-vectorize -ftree-slp-vectorize
-CFLAGS += -Wall -Wextra
-LDFLAGS = -L/opt/amd/aocc-compiler-2.0.0/bin/lib -lamdlibm
-LDFLAGS += -Wl,-rpath -Wl,/opt/amd/aocc-compiler-2.0.0/lib -lm
-LDFLAGS += -fuse-ld=gold
-LDFLAGS_OPENMP = -L/opt/amd/aocc-compiler-2.0.0/lib -lomp
+CFLAGS += -Wall -Wextra -flto=32
+LDFLAGS = -lm
 OPENMP = -fopenmp
 
 PROGRAMS = isprime popcnt clz ctz geomean findprimes
@@ -21,7 +18,7 @@ popcnt: popcnt.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 findprimes: findprimes.o
-	$(CC) $(CFLAGS) $(OPENMP) $(LDFLAGS) $(LDFLAGS_OPENMP) $< -o $@
+	$(CC) $(CFLAGS) $(OPENMP) $(LDFLAGS) $< -o $@
 
 geomean: geomean.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
