@@ -1,0 +1,3 @@
+setenv OMP_NUM_THREADS 8
+setenv OMP_SCHEDULE "static,8"
+

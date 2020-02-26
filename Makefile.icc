@@ -1,0 +1,45 @@
+CC = /opt/intel/bin/icc
+
+CFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
+CFLAGS += -O3 -std=c99 -march=corei7-avx
+CFLAGS += -Wall -Wextra
+CFLAGS += -ipo -qopt-prefetch -qopt-mem-layout-trans=3
+CFLAGS += -finline-functions -funroll-loops
+CFLAGS += -flto
+LDFLAGS = -L/opt/intel/lib/intel64
+LDFLAGS += -Wl,-rpath -Wl,/opt/intel/lib/intel64
+LDFLAGS += -fuse-ld=gold
+LDFLAGS_OPENMP = -L/opt/intel/lib/intel64 -liomp5
+OPENMP = -fopenmp
+
+PROGRAMS = isprime popcnt clz ctz geomean findprimes
+
+all: $(PROGRAMS)
+
+isprime: isprime.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+popcnt: popcnt.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+findprimes: findprimes.o
+	$(CC) $(CFLAGS) $(OPENMP) $(LDFLAGS) $(LDFLAGS_OPENMP) $< -o $@
+
+geomean: geomean.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+clz: clz.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+ctz: ctz.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+findprimes.o: findprimes.c
+	$(CC) $(CFLAGS) $(OPENMP) -c $< -o $@
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f *.o $(PROGRAMS)
+
