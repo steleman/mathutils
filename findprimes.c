@@ -91,6 +91,10 @@ static void print_time(const char* filename)
   long double t = (double) ts_diff.tv_nsec / 1000000000;
   t += (long double) ts_diff.tv_sec;
 
+#if defined(_OPENMP)
+  t /= omp_get_max_threads();
+#endif
+
   (void) fprintf(fp, "-----\n");
   (void) fprintf(fp, "Discovered %lu prime numbers in %Lf seconds.\n",
                  prime_index, t);
@@ -296,6 +300,13 @@ int main(int argc, char* argv[])
 
   if (allocate_storage() != 0)
     return -1;
+
+#if defined(_OPENMP)
+  const char* nt;
+  if (nt = getenv("OMP_NUM_THREADS")) {
+    omp_set_num_threads((int) strtoul(nt, NULL, 10));
+  }
+#endif
 
   find_primes();
 
