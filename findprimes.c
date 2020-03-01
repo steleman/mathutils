@@ -37,9 +37,25 @@ static uint64_t prime_index = 0UL;
 static uint64_t* prime_storage = NULL;
 static bool print_header = false;
 static bool print_timestamp = false;
+static bool print_mersenne = false;
 static struct timespec ts_begin = { 0, 0 };
 static struct timespec ts_end = { 0, 0 };
 static struct timespec ts_correct = { 0, 0 };
+
+static const uint64_t PT[] = {
+  1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192,
+  16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152,
+  4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456,
+  536870912, 1073741824, 2147483648, 4294967296, 8589934592, 17179869184,
+  34359738368, 68719476736, 137438953472, 274877906944, 549755813888,
+  1099511627776, 2199023255552, 4398046511104, 8796093022208, 17592186044416,
+  35184372088832, 70368744177664, 140737488355328, 281474976710656,
+  562949953421312, 1125899906842624, 2251799813685248, 4503599627370496,
+  9007199254740992, 18014398509481984, 36028797018963968, 72057594037927936,
+  144115188075855872, 288230376151711744, 576460752303423488,
+  1152921504606846976, 2305843009213693952, 4611686018427387904,
+  9223372036854775808, 18446744073709551615
+};
 
 static void print_help(void)
 {
@@ -47,6 +63,7 @@ static void print_help(void)
   (void) fprintf(stderr, "       [ -e <range-end> "
                          "(default ULONG_MAX | ULLONG_MAX)]\n");
   (void) fprintf(stderr, "       [ -b <number-of-bits> (default 64)]\n");
+  (void) fprintf(stderr, "       [ -M <identify Mersenne primes>]\n");
   (void) fprintf(stderr, "       [ -f <output-file> (default stdout)]\n");
   (void) fprintf(stderr, "       [ -p <print header at the top>]\n");
   (void) fprintf(stderr, "       [ -t <print prime discovery time>]\n");
@@ -122,6 +139,24 @@ static bool is_prime(uint64_t x)
   return true;
 }
 
+static bool mersenne(uint64_t x) {
+    if (x < 3)
+    return false;
+
+  for (unsigned i = 0; i < 65; ++i) {
+    if (PT[i] > x) {
+      uint64_t d = PT[i] - x;
+      if (d == 1ULL)
+        return true;
+
+      if (d > 1ULL)
+        break;
+    }
+  }
+
+  return false;
+}
+
 static int check_bits(unsigned bits)
 {
   if ((bits == 32) && (range_end > UINT_MAX)) {
@@ -189,8 +224,15 @@ static int print_primes(const char* filename)
     (void) fprintf(fp, "List of prime numbers in the range %lu - %lu:\n\n",
                    range_start, range_end);
 
-  for (uint64_t i = 0; i < prime_index; ++i)
-    (void) fprintf(fp, "%lu\n", prime_storage[i]);
+  for (uint64_t i = 0; i < prime_index; ++i) {
+    (void) fprintf(fp, "%lu", prime_storage[i]);
+    if (print_mersenne) {
+      if (mersenne(prime_storage[i]))
+        (void) fprintf(fp, " [*M]");
+    }
+
+    (void) fprintf(fp, "\n");
+  }
 
   (void) fflush(fp);
 
@@ -255,7 +297,7 @@ int main(int argc, char* argv[])
   bool ph = (argc == 1);
   const char* filename = NULL;
 
-  while ((opt = getopt(argc, argv, "hpts:e:b:f:")) != -1) {
+  while ((opt = getopt(argc, argv, "hMpts:e:b:f:")) != -1) {
     switch (opt) {
     case 'h':
       ph = true;
@@ -274,6 +316,9 @@ int main(int argc, char* argv[])
       break;
     case 'p':
       print_header = true;
+      break;
+    case 'M':
+      print_mersenne = true;
       break;
     case 't':
       print_timestamp = true;
