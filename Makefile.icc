@@ -1,4 +1,5 @@
 CC = /opt/intel/bin/icc
+CXX = /opt/intel/bin/icpc
 
 CFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
 CFLAGS += -O3 -std=c99 -march=corei7-avx
@@ -6,13 +7,21 @@ CFLAGS += -Wall -Wextra
 CFLAGS += -ipo -qopt-prefetch -qopt-mem-layout-trans=3
 CFLAGS += -finline-functions -funroll-loops
 CFLAGS += -flto
+
+CXXFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
+CXXFLAGS += -O3 -std=c++11 -march=corei7-avx
+CXXFLAGS += -Wall -Wextra
+CXXFLAGS += -ipo -qopt-prefetch -qopt-mem-layout-trans=3
+CXXFLAGS += -finline-functions -funroll-loops
+CXXFLAGS += -flto
+
 LDFLAGS = -L/opt/intel/lib/intel64
 LDFLAGS += -Wl,-rpath -Wl,/opt/intel/lib/intel64
 LDFLAGS += -fuse-ld=gold
 LDFLAGS_OPENMP = -L/opt/intel/lib/intel64 -liomp5
 OPENMP = -fopenmp
 
-PROGRAMS = isprime popcnt clz ctz geomean findprimes
+PROGRAMS = isprime popcnt clz ctz geomean findprimes goldbach
 
 all: $(PROGRAMS)
 
@@ -24,6 +33,9 @@ popcnt: popcnt.o
 
 findprimes: findprimes.o
 	$(CC) $(CFLAGS) $(OPENMP) $(LDFLAGS) $(LDFLAGS_OPENMP) $< -o $@
+
+goldbach: goldbach.o
+	$(CXX) $(CXXFLAGS) $(OPENMP) $(LDFLAGS) $(LDFLAGS_OPENMP) $< -o $@
 
 geomean: geomean.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
@@ -37,8 +49,14 @@ ctz: ctz.o
 findprimes.o: findprimes.c
 	$(CC) $(CFLAGS) $(OPENMP) -c $< -o $@
 
+goldbach.o: goldbach.cpp
+	$(CXX) $(CXXFLAGS) $(OPENMP) -c $< -o $@
+
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -f *.o $(PROGRAMS)
