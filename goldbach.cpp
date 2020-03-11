@@ -67,7 +67,7 @@ bool checknumber(uint64_t N) {
   if (N <= 2UL) {
     std::cerr << "N=" << N << " is less than 2!" << std::endl;
     return false;
-  } else if ((N % 2) != 0) {
+  } else if (N & 1) {
     std::cerr << "N=" << N << " is not an even number!" << std::endl;
     return false;
   }
