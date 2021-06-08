@@ -1,16 +1,26 @@
-CC = /opt/amd/aocc-compiler-2.0.0/bin/clang
+# Change this to 2.0.0 if you have the older version of AOCC.
+AOCC_VERSION = 2.1.0
+
+CC = /opt/amd/aocc-compiler-$(AOCC_VERSION)/bin/clang
+CXX = /opt/amd/aocc-compiler-$(AOCC_VERSION)/bin/clang++
 
 CFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
 CFLAGS += -O3 -std=c99 -march=znver2
 CFLAGS += -ftree-vectorize -ftree-slp-vectorize
-CFLAGS += -Wall -Wextra
-LDFLAGS = -L/opt/amd/aocc-compiler-2.0.0/bin/lib -lamdlibm
-LDFLAGS += -Wl,-rpath -Wl,/opt/amd/aocc-compiler-2.0.0/lib -lm
-LDFLAGS += -fuse-ld=gold
-LDFLAGS_OPENMP = -L/opt/amd/aocc-compiler-2.0.0/lib -lomp
+CFLAGS += -Wall -Wextra -flto
+
+CXXFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
+CXXFLAGS += -O3 -std=c++11 -march=znver2
+CXXFLAGS += -ftree-vectorize -ftree-slp-vectorize
+CXXFLAGS += -Wall -Wextra -flto
+
+LDFLAGS = -L/opt/amd/aocc-compiler-$(AOCC_VERSION)/bin/lib -lamdlibm
+LDFLAGS += -Wl,-rpath -Wl,/opt/amd/aocc-compiler-$(AOCC_VERSION)/lib -lm
+LDFLAGS += -fuse-ld=lld
+LDFLAGS_OPENMP = -L/opt/amd/aocc-compiler-$(AOCC_VERSION)/lib -lomp
 OPENMP = -fopenmp
 
-PROGRAMS = isprime popcnt clz ctz geomean findprimes
+PROGRAMS = isprime popcnt clz ctz geomean findprimes goldbach
 
 all: $(PROGRAMS)
 
@@ -22,6 +32,9 @@ popcnt: popcnt.o
 
 findprimes: findprimes.o
 	$(CC) $(CFLAGS) $(OPENMP) $(LDFLAGS) $(LDFLAGS_OPENMP) $< -o $@
+
+goldbach: goldbach.o
+	$(CXX) $(CXXFLAGS) $(OPENMP) $(LDFLAGS) $(LDFLAGS_OPENMP) $< -o $@
 
 geomean: geomean.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
@@ -35,8 +48,14 @@ ctz: ctz.o
 findprimes.o: findprimes.c
 	$(CC) $(CFLAGS) $(OPENMP) -c $< -o $@
 
+goldbach.o: goldbach.cpp
+	$(CXX) $(CXXFLAGS) $(OPENMP) -c $< -o $@
+
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -f *.o $(PROGRAMS)
