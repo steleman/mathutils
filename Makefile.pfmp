@@ -1,0 +1,22 @@
+CXX = /usr/bin/g++
+CXXFLAGS = -O3 -std=c++11 -pedantic -Wall -Wextra -Wpedantic
+CXXFLAGS += -ftree-vectorize -ftree-slp-vectorize -mtune=corei7-avx
+CXXFLAGS += -finline-functions -funroll-loops
+CPPFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700
+LDFLAGS = -lgmp
+
+PROGRAM = primefactorsmp
+
+OBJECTS = primefactorsmp.o
+
+all: $(OBJECTS) $(PROGRAM)
+
+primefactorsmp: $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+
+*.cpp.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(PROGRAM) $(OBJECTS)
+
