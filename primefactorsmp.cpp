@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <vector>
 #include <cstring>
 #include <cmath>
 
@@ -61,12 +62,19 @@ public:
     return S;
   }
 
-private:
   mpz_t MP;
   std::string S;
 };
 
-std::set<MPZ*> Factors;
+template<typename T>
+struct mpz_less : public std::binary_function<T, T, bool> {
+public:
+  constexpr inline bool operator()(const T& L, const T& R) const {
+    return mpz_cmp(L->MP, R->MP) < 0;
+  }
+};
+
+std::set<MPZ*, mpz_less<MPZ*>> Factors;
 static unsigned NumBits = static_cast<unsigned>(~0x0);
 
 static void PrimeFactors(mpz_t N, unsigned NumBits) {
@@ -149,12 +157,12 @@ static void PrintFactors(const mpz_t& N) {
   MPZ* NS = new MPZ(N, NumBits);
   std::cout << "Prime Factors of " << NS->AsString() << ":";
 
-  std::set<std::string> FS;
+  std::vector<std::string> FV;
   for (std::set<MPZ*>::iterator I = Factors.begin();
        I != Factors.end(); ++I)
-    (void) FS.insert((*I)->AsString());
+    FV.push_back((*I)->AsString());
 
-  for (std::set<std::string>::iterator I = FS.begin(); I != FS.end(); ++I)
+  for (std::vector<std::string>::iterator I = FV.begin(); I != FV.end(); ++I)
     std::cout << " " << *I;
 
   std::cout << std::endl;
@@ -186,7 +194,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  if (NumBits == static_cast<unsigned>(~0x0)) {
+  if (NumBits == static_cast<unsigned>(~0x0) || NumBits < 32) {
     std::cerr << "Error: Invalid number of bits!" << std::endl;
     return 1;
   }
