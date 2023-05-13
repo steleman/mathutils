@@ -16,11 +16,15 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <set>
 #include <vector>
 #include <cstring>
 #include <cmath>
+#include <cstring>
+#include <ctime>
+#include <cerrno>
 
 #include <unistd.h>
 #include <gmp.h>
@@ -34,6 +38,40 @@ static void (*gmp_free_mem_func)(void*, size_t);
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+static struct timespec tp_start;
+static struct timespec tp_end;
+
+static int Timestamp(struct timespec* ts) {
+  if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, ts) != 0) {
+    std::cerr << "clock_gettime(2) failed: " << strerror(errno)
+      << std::endl;
+    return -1;
+  }
+
+  return 0;
+}
+
+static void PrintTimespec(const struct timespec* ts) {
+  std::cerr << "sec: " << std::setfill('0') << std::setw(9)
+    << ts->tv_sec << std::endl;
+  std::cerr << "nns: " << std::setfill('0') << std::setw(12)
+    << ts->tv_nsec << std::endl;
+}
+
+static void PrintTimediff(const struct timespec* start,
+                          const struct timespec* end) {
+  uint64_t sec = (uint64_t) end->tv_sec - start->tv_sec;
+  uint64_t nns = (uint64_t) end->tv_nsec - start->tv_nsec;
+
+  if (nns >= 1000000000) {
+    sec += nns / 1000000000;
+    nns = nns % 1000000000;
+  }
+
+  std::cerr << "CPU time: " << sec << '.' << std::setfill('0') << std::setw(12)
+    << nns << " second(s)." << std::endl;
+}
 
 class MPZ {
 private:
@@ -208,8 +246,12 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  Timestamp(&tp_start);
   PrimeFactors(N, NumBits);
+  Timestamp(&tp_end);
+
   PrintFactors(N);
+  PrintTimediff(&tp_start, &tp_end);
   Cleanup();
 
   return 0;

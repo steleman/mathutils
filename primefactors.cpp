@@ -16,13 +16,50 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <set>
 #include <cmath>
 #include <cstring>
+#include <ctime>
+#include <cerrno>
 
 static std::set<uint64_t> Factors;
 static bool Check = false;
+
+static struct timespec tp_start;
+static struct timespec tp_end;
+
+static int Timestamp(struct timespec* ts) {
+  if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, ts) != 0) {
+    std::cerr << "clock_gettime(2) failed: " << strerror(errno)
+      << std::endl;
+    return -1;
+  }
+
+  return 0;
+}
+
+static void PrintTimespec(const struct timespec* ts) {
+  std::cerr << "sec: " << std::setfill('0') << std::setw(9)
+    << ts->tv_sec << std::endl;
+  std::cerr << "nns: " << std::setfill('0') << std::setw(12)
+    << ts->tv_nsec << std::endl;
+}
+
+static void PrintTimediff(const struct timespec* start,
+                          const struct timespec* end) {
+  uint64_t sec = (uint64_t) end->tv_sec - start->tv_sec;
+  uint64_t nns = (uint64_t) end->tv_nsec - start->tv_nsec;
+
+  if (nns >= 1000000000) {
+    sec += nns / 1000000000;
+    nns = nns % 1000000000;
+  }
+
+  std::cerr << "CPU time: " << sec << '.' << std::setfill('0') << std::setw(12)
+    << nns << " second(s)." << std::endl;
+}
 
 static inline bool IsPrime(uint64_t N)
 {
@@ -107,11 +144,20 @@ int main(int argc, char* argv[])
     Check = true;
 
   uint64_t N = (uint64_t) std::stoul(argv[1]);
-  PrimeFactors(N);
-  PrintFactors(N);
 
-  if (Check)
+  Timestamp(&tp_start);
+  PrimeFactors(N);
+  Timestamp(&tp_end);
+  PrintFactors(N);
+  PrintTimediff(&tp_start, &tp_end);
+
+
+  if (Check) {
+    Timestamp(&tp_start);
     CheckFactors();
+    Timestamp(&tp_end);
+    PrintTimediff(&tp_start, &tp_end);
+  }
 
   return 0;
 }
