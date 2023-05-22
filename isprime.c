@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2018, 2019 Stefan Teleman.
+ * Copyright (C) 2018 Stefan Teleman.
  */
 
 #include <stdio.h>
@@ -31,17 +31,14 @@ int main(int argc, char* argv[])
   bool NP = false;
   uint64_t X = strtoul(argv[1], NULL, 10);
 
-  if (X == 2UL)
-    goto shortcut;
-
-  if (!(X & 1) || (X == 0UL)) {
+  if (!(X & 1) || (X == 0UL) || X == 2UL) {
     NP = true;
     goto shortcut;
   }
 
-  uint64_t S = (uint64_t) ceill(sqrtl(X));
+  uint64_t S = (uint64_t) sqrt(X);
 
-  for (uint64_t I = 3; I <= S; ++I) {
+  for (uint64_t I = 3; I <= S; I += 2) {
     if ((X % I) == 0) {
       NP = true;
       goto shortcut;
