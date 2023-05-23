@@ -1,19 +1,19 @@
-CC = /usr/bin/gcc
-CXX = /usr/bin/g++
+CC = /usr/bin/clang
+CXX = /usr/bin/clang++
 
 CFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700 -D_REENTRANT
 CFLAGS += -O3 -std=c99 -mtune=core-avx2 -pthread
-CFLAGS += -ftree-vectorize -ftree-slp-vectorize
+CFLAGS += -fvectorize -fslp-vectorize
 CFLAGS += -finline-functions -funroll-loops
-CFLAGS += -Wall -Wextra -Wpedantic -flto=32
+CFLAGS += -Wall -Wextra -Wpedantic -flto
 
 CXXFLAGS = -D_GNU_SOURCE -D_XOPEN_SOURCE=700 -D_REENTRANT
 CXXFLAGS += -O3 -std=c++17 -mtune=core-avx2 -pthread
-CXXFLAGS += -ftree-vectorize -ftree-slp-vectorize
+CXXFLAGS += -fvectorize -fslp-vectorize
 CXXFLAGS += -finline-functions -funroll-loops
-CXXFLAGS += -Wall -Wextra -Wpedantic -flto=32
+CXXFLAGS += -Wall -Wextra -Wpedantic -flto
 
-LDFLAGS = -lm
+LDFLAGS = -fuse-ld=lld -lm
 GNUMP = -lgmp
 OPENMP = -fopenmp
 
