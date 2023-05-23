@@ -186,19 +186,23 @@ static int print_primes(const char* filename)
 extern "C" {
   void* prime_thread_start(void* arg) {
     prime_range* pr = (prime_range*) arg;
+    uint32_t pc = 0U;
 
     for (uint64_t p = pr->start; p <= pr->end; p += 2) {
       if (is_prime(p)) {
         add_prime(p);
+        ++pc;
       }
     }
+
+    (void) std::fprintf(stderr, "thread %u [%lu -> %lu] is done [%u].\n",
+                        pr->tid, pr->start, pr->end, pc);
+    (void) std::fflush(stderr);
 
     pthread_mutex_lock(&mutex);
     thread_count += 1U;
     pthread_mutex_unlock(&mutex);
 
-    (void) std::fprintf(stderr, "thread %u [%lu -> %lu] is done.\n",
-                        pr->tid, pr->start, pr->end);
     return NULL;
   }
 
@@ -210,7 +214,7 @@ extern "C" {
     tc = thread_count;
     pthread_mutex_unlock(&mutex);
 
-    while (tc < (nthreads - 1)) {
+    while (tc < nthreads) {
       select(0, NULL, NULL, NULL, &ttv);
       ttv.tv_sec = 0;
       ttv.tv_usec = 1000;
