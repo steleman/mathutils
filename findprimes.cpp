@@ -126,7 +126,7 @@ bool is_prime(uint64_t x)
 
   uint64_t s = (uint64_t) std::ceil(std::sqrt(x));
 
-  for (uint64_t i = 3UL; i <= s; ++i) {
+  for (uint64_t i = 3UL; i <= s; i += 2UL) {
     if ((x % i) == 0) {
       return false;
     }

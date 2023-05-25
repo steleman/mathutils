@@ -13,12 +13,12 @@ CXXFLAGS += -ftree-vectorize -ftree-slp-vectorize
 CXXFLAGS += -finline-functions -funroll-loops
 CXXFLAGS += -Wall -Wextra -Wpedantic -flto=32
 
-LDFLAGS = -lm
+LDFLAGS = -fuse-ld=gold -Wl,-O3 -lm
 GNUMP = -lgmp
 OPENMP = -fopenmp
 
-PROGRAMS = isprime isprimemp popcnt clz ctz geomean findprimes goldbach
-PROGRAMS += primefactors primefactorsmp
+PROGRAMS = isprime isprimemp popcnt clz ctz geomean findprimes findprimesmp
+PROGRAMS += goldbach primefactors primefactorsmp
 
 all: $(PROGRAMS)
 
@@ -33,6 +33,9 @@ popcnt: popcnt.o
 
 findprimes: findprimes.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+
+findprimesmp: findprimesmp.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(GNUMP) $< -o $@
 
 primefactors: primefactors.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
