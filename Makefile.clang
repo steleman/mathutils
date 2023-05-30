@@ -31,6 +31,9 @@ isprimemp: isprimemp.o
 popcnt: popcnt.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
+arithmpz: arithmpz.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $(GNUMP) $< -o $@
+
 findprimes: findprimes.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 

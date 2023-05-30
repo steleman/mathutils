@@ -18,7 +18,7 @@ GNUMP = -lgmp
 OPENMP = -fopenmp
 
 PROGRAMS = isprime isprimemp popcnt clz ctz geomean findprimes findprimesmp
-PROGRAMS += goldbach primefactors primefactorsmp
+PROGRAMS += goldbach primefactors primefactorsmp arithmpz
 
 all: $(PROGRAMS)
 
@@ -30,6 +30,9 @@ isprimemp: isprimemp.o
 
 popcnt: popcnt.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+
+arithmpz: arithmpz.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $(GNUMP) $< -o $@
 
 findprimes: findprimes.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
