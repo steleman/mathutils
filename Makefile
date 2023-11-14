@@ -18,7 +18,7 @@ GNUMP = -lgmp
 OPENMP = -fopenmp
 
 PROGRAMS = isprime isprimemp popcnt clz ctz geomean findprimes findprimesmp
-PROGRAMS += goldbach primefactors primefactorsmp arithmpz
+PROGRAMS += findprimesomp goldbach primefactors primefactorsmp arithmpz
 
 all: $(PROGRAMS)
 
