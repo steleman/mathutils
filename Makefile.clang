@@ -40,6 +40,9 @@ findprimes: findprimes.o
 findprimesmp: findprimesmp.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(GNUMP) $< -o $@
 
+findprimesomp: findprimesomp.o
+	$(CC) $(CFLAGS) $(OPENMP) $(LDFLAGS) $< -o $@
+
 primefactors: primefactors.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 
@@ -60,6 +63,9 @@ ctz: ctz.o
 
 goldbach.o: goldbach.cpp
 	$(CXX) $(CXXFLAGS) $(OPENMP) -c $< -o $@
+
+findprimesomp.o: findprimes.c
+	$(CC) $(CFLAGS) $(OPENMP) -c $< -o $@
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
