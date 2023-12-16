@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <string>
 #include <set>
+#include <map>
 #include <vector>
 #include <cstring>
 #include <cmath>
@@ -100,6 +101,14 @@ public:
     return S;
   }
 
+  inline bool operator==(const MPZ& R) const {
+    return mpz_cmp(MP, R.MP) == 0;
+  }
+
+  inline bool operator==(const MPZ* R) const {
+    return mpz_cmp(MP, R->MP) == 0;
+  }
+
   mpz_t MP;
   std::string S;
 };
@@ -112,7 +121,7 @@ public:
   }
 };
 
-std::set<MPZ*, mpz_less<MPZ*>> Factors;
+std::multiset<MPZ*, mpz_less<MPZ*>> Factors;
 static unsigned NumBits = static_cast<unsigned>(~0x0);
 
 static void PrimeFactors(mpz_t N, unsigned NumBits) {
@@ -181,7 +190,7 @@ static void PrimeFactors(mpz_t N, unsigned NumBits) {
 }
 
 static void Cleanup() {
-  for (std::set<MPZ*>::iterator I = Factors.begin();
+  for (std::multiset<MPZ*>::iterator I = Factors.begin();
        I != Factors.end(); ++I)
     delete *I;
 }
@@ -195,15 +204,42 @@ static void PrintFactors(const mpz_t& N) {
   MPZ* NS = new MPZ(N, NumBits);
   std::cout << "Prime Factors of " << NS->AsString() << ":";
 
-  std::vector<std::string> FV;
-  for (std::set<MPZ*>::iterator I = Factors.begin();
-       I != Factors.end(); ++I)
-    FV.push_back((*I)->AsString());
+  std::map<MPZ*, uint32_t, mpz_less<MPZ*>> FM;
+  std::string SR;
 
-  for (std::vector<std::string>::iterator I = FV.begin(); I != FV.end(); ++I)
-    std::cout << " " << *I;
+  for (std::multiset<MPZ*>::iterator I = Factors.begin();
+       I != Factors.end(); ++I) {
+    if (!(FM.insert(std::make_pair(*I, 1U)).second)) {
+      std::map<MPZ*, uint32_t>::iterator MI = FM.find(*I);
+      (*MI).second++;
+    }
+  }
+
+  for (std::map<MPZ*, uint32_t, mpz_less<MPZ*>>::const_iterator MI = FM.begin();
+       MI != FM.end(); ++MI) {
+    std::cout << ' ' << (*MI).first->AsString();
+  }
 
   std::cout << std::endl;
+
+  std::map<MPZ*, uint32_t, mpz_less<MPZ*>>::const_iterator MIE;
+  std::cout << "Product: [";
+
+  for (std::map<MPZ*, uint32_t, mpz_less<MPZ*>>::const_iterator MI = FM.begin();
+       MI != FM.end(); ++MI) {
+    if ((*MI).second == 1U)
+      std::cout << (*MI).first->AsString();
+    else
+      std::cout << '(' << (*MI).first->AsString() << " ** "
+        << (*MI).second << ')';
+
+    MIE = MI;
+    ++MIE;
+    if (MIE != FM.end())
+      std::cout << " * ";
+  }
+
+  std::cout << ']' << std::endl;
   delete NS;
 }
 
