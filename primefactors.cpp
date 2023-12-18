@@ -19,12 +19,14 @@
 #include <iomanip>
 #include <string>
 #include <set>
+#include <map>
 #include <cmath>
 #include <cstring>
 #include <ctime>
 #include <cerrno>
 
-static std::set<uint64_t> Factors;
+static std::multiset<uint64_t> Factors;
+static std::map<uint64_t, uint32_t> FM;
 static bool Check = false;
 
 static struct timespec tp_start;
@@ -75,9 +77,6 @@ static inline bool IsPrime(uint64_t N)
   uint64_t SQR = static_cast<uint64_t>(std::sqrt(N) + 1ULL);
 
   for (uint64_t I = 3UL; I <= SQR; I += 2UL) {
-    if ((static_cast<uint64_t>(I % 2ULL)) == 0UL)
-      continue;
-
     if ((static_cast<uint64_t>(N % I)) == 0UL)
       return false;
   }
@@ -104,16 +103,18 @@ static void PrimeFactors(uint64_t N) {
 
   if (N > 2 && IsPrime(N))
     Factors.insert(N);
+  if (NX > 2 && IsPrime(NX))
+    Factors.insert(NX);
 }
 
 static void CheckFactors() {
   std::cout << "----------------------------" << std::endl;
-  for (std::set<uint64_t>::const_iterator I = Factors.begin();
-       I != Factors.end(); ++I) {
-    if (IsPrime(*I))
-      std::cout << *I << " is prime." << std::endl;
+  for (std::map<uint64_t, uint32_t>::const_iterator I = FM.begin();
+       I != FM.end(); ++I) {
+    if (IsPrime((*I).first))
+      std::cout << (*I).first << " is prime." << std::endl;
     else
-      std::cout << *I << " is NOT prime." << std::endl;
+      std::cout << (*I).first << " is NOT prime." << std::endl;
   }
   std::cout << "----------------------------" << std::endl;
 }
@@ -125,12 +126,40 @@ static void PrintUsage() {
 static void PrintFactors(uint64_t N) {
   std::cout << "Prime Factors of " << N << ":";
 
-  for (std::set<uint64_t>::iterator I = Factors.begin();
+  FM.clear();
+
+  for (std::multiset<uint64_t>::iterator I = Factors.begin();
        I != Factors.end(); ++I) {
-    std::cout << " " << (*I);
+    if (!(FM.insert(std::make_pair(*I, 1U)).second)) {
+      std::map<uint64_t, uint32_t>::iterator MI = FM.find(*I);
+      ++((*MI).second);
+    }
+  }
+
+  for (std::map<uint64_t, uint32_t>::iterator I = FM.begin();
+       I != FM.end(); ++I) {
+    std::cout << " " << (*I).first;
   }
 
   std::cout << std::endl;
+
+  std::map<uint64_t, uint32_t>::const_iterator MIE;
+  std::cout << "Product: [";
+
+  for (std::map<uint64_t, uint32_t>::const_iterator MI = FM.begin();
+       MI != FM.end(); ++MI) {
+    if ((*MI).second == 1U)
+      std::cout << (*MI).first;
+    else
+      std::cout << '(' << (*MI).first << " ** " << (*MI).second << ')';
+
+    MIE = MI;
+    ++MIE;
+    if (MIE != FM.end())
+      std::cout << " * ";
+  }
+
+  std::cout << ']' << std::endl;
 }
 
 int main(int argc, char* argv[])
